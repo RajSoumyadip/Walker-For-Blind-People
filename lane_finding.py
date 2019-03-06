@@ -2,6 +2,7 @@ import numpy as np
 from PIL import ImageGrab
 import cv2
 from numpy import ones,vstack
+from imutils.video import VideoStream
 from numpy.linalg import lstsq
 from statistics import mean
 
@@ -141,14 +142,17 @@ def process_img(original_image):
     return processed_image,original_image
 
 
-
+cap = cv2.VideoCapture(0)
 
 while(True):
-    screen = np.array(ImageGrab.grab(bbox=(0, 40, 800, 640)))
+    ret, frame = cap.read()
+    screen = np.array(frame)
+    print(np.array(frame))
     new_screen,original_image = process_img(screen)
-    cv2.imshow('window', new_screen)
     cv2.imshow('window2',cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB))
     if cv2.waitKey(25) & 0xFF == ord('q'):
         cv2.destroyAllWindows()
-        break
+        break 
+        
+   
         
