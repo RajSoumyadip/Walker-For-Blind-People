@@ -16,6 +16,12 @@ cap = cv2.VideoCapture(0)
 # This is needed since the notebook is stored in the object_detection folder.
 sys.path.append("..")
 
+def roi(img, vertices):
+    mask = np.zeros_like(img)
+    cv2.fillPoly(mask, vertices, 255)
+    masked = cv2.bitwise_and(img, mask)
+    return masked
+
 
 # ## Object detection imports
 # Here are the imports from the object detection module.
@@ -67,9 +73,12 @@ category_index = label_map_util.create_category_index(categories)
 
 # ## Helper code
 def load_image_into_numpy_array(image):
-  (im_width, im_height) = image.size
-  return np.array(image.getdata()).reshape(
-      (im_height, im_width, 3)).astype(np.uint8)
+    vertices = np.array([[10,500],[10,300],[300,200],[500,200],[800,300],[800,500],
+                         ], np.int32)
+    processed_image = roi(image, [vertices])
+    (im_width, im_height) = processed_image.size
+    return np.array(image.getdata()).reshape(
+        (im_height, im_width, 3)).astype(np.uint8)
 
 # Size, in inches, of the output images.
 IMAGE_SIZE = (12, 8)
@@ -79,7 +88,11 @@ with detection_graph.as_default():
     while True:
       ret, frame = cap.read()
       #screen = cv2.resize(grab_screen(region=(0,40,1280,745)), (WIDTH,HEIGHT))
-      image_np = frame
+      ret, frame = cap.read()
+      cv2.rectangle(frame, (225, 381), (1027, 712), (255,0,0), 2)
+      cv2.rectangle(frame, (416, 256), (805, 712), (255,0,0), 2)
+      vertices = np.array([[226,381],[417,260],[806,260],[1028,383],[1028,710],[226,711],], np.int32)
+      image_np = roi(frame, [vertices])
       # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
       image_np_expanded = np.expand_dims(image_np, axis=0)
       image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
@@ -117,7 +130,7 @@ with detection_graph.as_default():
             if apx_distance <=0.5:
               if mid_x > 0.3 and mid_x < 0.7:
                 cv2.putText(image_np, 'WARNING!!!', (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0,0,255), 3)
-
+                os.system('say warning')
 
       cv2.imshow('object detection', image_np)
       if cv2.waitKey(25) & 0xFF == ord('q'):
