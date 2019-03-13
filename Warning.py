@@ -108,7 +108,7 @@ with detection_graph.as_default():
           [boxes, scores, classes, num_detections],
           feed_dict={image_tensor: image_np_expanded})
       # Visualization of the results of a detection.
-      vis_util.visualize_boxes_and_labels_on_image_array(
+      (image, temp)=vis_util.visualize_boxes_and_labels_on_image_array(
           image_np,
           np.squeeze(boxes),
           np.squeeze(classes).astype(np.int32),
@@ -130,7 +130,7 @@ with detection_graph.as_default():
             if apx_distance <=0.5:
               if mid_x > 0.3 and mid_x < 0.7:
                 cv2.putText(image_np, 'WARNING!!!', (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0,0,255), 3)
-                os.system('say warning')
+                os.system('say '+temp)
 
       cv2.imshow('object detection', image_np)
       if cv2.waitKey(25) & 0xFF == ord('q'):
