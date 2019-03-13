@@ -31,9 +31,10 @@ def process_img(original_image):
 
 
 
-
+cap = cv2.VideoCapture(0)
 while(True):
-    screen = np.array(ImageGrab.grab(bbox=(0, 40, 800, 640)))
+    ret, frame = cap.read()
+    screen = np.array(frame)
     new_screen = process_img(screen)
     cv2.imshow('window', new_screen)
     #cv2.imshow('window', cv2.cvtColor(screen, cv2.COLOR_BGR2RGB))
